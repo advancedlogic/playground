@@ -1,83 +1,48 @@
-<div class="relative bg-slate-800 w-2/3 rounded-lg p-4 flex flex-col items-center justify-start">
-    <div class="
-        w-full
-        flex-none flex flex-row items-center space-x-2
-        text-slate-400">
-        <i class="flex-none fa fa-magnifying-glass"></i>
-        <input 
-            type="text" 
-            placeholder="   type your query here..."
-            bind:value={input}
-            class="
-                p-2
-                bg-slate-800
-                outline-none
-                flex-auto">
-    <div class="form-check">
-        <input class="form-check-input 
-            appearance-none 
-            h-4 w-4 
-            border border-red-300 
-            rounded-full
-            bg-red-600 checked:bg-green-800 
-            checked:border-green-600 
-            focus:outline-none 
-            transition duration-200 
-            mt-1 
-            align-top 
-            bg-no-repeat 
-            bg-center 
-            bg-contain 
-            float-left 
-            mr-2 
-            cursor-pointer" type="checkbox" on:click={enableSemantic}>
-        <label class="text-slate-400" for="">
-            {#if semantic}
-            Semantic Search Enabled
-            {:else}
-            Semantic Search Disabled
-            {/if}
-        </label>
-    </div>
-    </div>
-    {#if semantic}
-    <div class="w-full flex items-center space-x-2 flex-wrap">
-        {#each tokens as token, i}
-            {#if map[token]}
-                {#each map[token] as tag}
-                <div class="px-0 py-1">
-                    <div class="px-2 py-1 cursor-pointer hover:bg-{colors[i]}-600 flex flex-row items-center space-x-2 rounded-lg {bgColors(i)} {textColors(i)} text-xs">
-                        <div class="">{tag}</div>
-                        <button type="button" class="rounded-full hover:bg-{colors[i]}-800 w-4 h-4">
-                            <i class="fa fa-x cursor-pointer"></i>
-                        </button>
-                    </div>
-                </div>
-                {/each}
-            {/if}
-        {/each}
-    </div>
+<div class="p-2 bg-slate-200 border-slate-300 shadow-lg rounded-lg w-full h-96 flex flex-row space-x-2 flex-wrap items-start justify-start">
+    {#if tags.length > 0}
+        <div on:keypress={(e) => e.key === 'Enter'? before(empty) : space()} 
+            bind:this={pre}
+            class="border-0 hover:border outline-none flex-none flex  w-{w === 0 ? '[8px]' : '[' + (8 + w) + 'px]'}" contenteditable="true" bind:textContent={empty}></div>
     {/if}
+    {#each tags as tag}
+        <div class="p-1 flex flex-row items-center justify-center">
+            <div class="px-2 flex-none bg-red-100 border-2 border-red-800 rounded-l-full">kwd</div>
+            <div class="px-2 flex-none flex text-red-100 bg-red-800 border-2 border-red-800 rounded-r-full" contenteditable="true">{tag}</div>
+        </div>
+    {/each}
+    <input on:keypress={(e) => e.key === 'Enter'? input(query) : ''} type="text" 
+    class="flex-1 pl-1 border-b border-slate-200 bg-slate-200 outline-none" bind:value={query} />
 </div>
 <script>
-    let input = "";
-    let semantic = false;
-    let map = {
-        "virus": ["microbiology", "medicine", "computer science"],
-        "bank": ["finance", "economy", "geography"],
-        "ball": ["sport", "anatomy"],
-        "soccer": ["sport"]
+    let tags = ["test"];
+    let empty = "  ";
+    let query = "";
+    let w = 0;
+    let pre = null;
+
+    let words = {
+        "virus": ["microbiology", "medicine", "computer science"]
     }
 
-    const enableSemantic = () => {
-        console.log("Template:enableSemantic:semantic", semantic);
-        semantic = !semantic;
+    const space = () => {
+        const text = pre.style.fontSize;
+        const width = text.clientWidth;
+        w = width;
+    }
+    const before = (item) => {
+        let tmp = tags;
+        tmp.unshift(item);
+        tags = tmp;
+        empty = "";
+        w=0;
+        console.log(tags)
+    }
+    const input = (item) => {
+        let tmp = tags;
+        tmp.push(item);
+        query = "";
+        tags = tmp;
+        console.log(tags)
     }
 
-    let ntoken = 0;
-    let colors = ["red", "blue", "green", "yellow", "orange", "purple", "brown", "slate", "gray"]
-
-    $: tokens = input.split(" ");
-    const bgColors = (i) => `bg-${colors[i]}-800`;
-    const textColors = (i) => `text-${colors[i]}-400`;
 </script>
